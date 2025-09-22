@@ -1,20 +1,69 @@
-package test.app;
+package test;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
-public class SortScreen extends JPanel {
-    private MainFrame parent;
-    private JPanel numbersPanel;
-    private JButton sortButton, resetButton;
+public class GranSoftTest extends JFrame {
+    private JPanel introPanel, sortPanel, numbersPanel;
+    private JTextField inputField;
+    private JButton enterButton, sortButton, resetButton;
 
     private int[] numbers;
     private boolean descending = true;
 
-    public SortScreen(MainFrame parent, int count) {
-        this.parent = parent;
-        setLayout(new BorderLayout());
+    public GranSoftTest() {
+        setTitle("GranSoftTest");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(600, 400);
+        setLocationRelativeTo(null);
+
+        initIntroScreen();
+        setVisible(true);
+    }
+
+    private void initIntroScreen() {
+        introPanel = new JPanel();
+        introPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+
+        JLabel label = new JLabel("Enter number of values:", SwingConstants.CENTER);
+        introPanel.add(label, gbc);
+
+        inputField = new JTextField();
+        inputField.setColumns(10);
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        introPanel.add(inputField, gbc);
+
+        enterButton = new JButton("Enter");
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        introPanel.add(enterButton, gbc);
+
+        enterButton.addActionListener(e -> {
+            try {
+                int count = Integer.parseInt(inputField.getText());
+                if (count <= 0) throw new NumberFormatException();
+                initSortScreen(count);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid positive number!");
+            }
+        });
+
+        setContentPane(introPanel);
+        revalidate();
+        repaint();
+    }
+
+    private void initSortScreen(int count) {
+        sortPanel = new JPanel(new BorderLayout());
 
         numbersPanel = new JPanel();
         generateNumbers(count);
@@ -26,11 +75,15 @@ public class SortScreen extends JPanel {
         bottomPanel.add(sortButton);
         bottomPanel.add(resetButton);
 
-        add(new JScrollPane(numbersPanel), BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        sortPanel.add(new JScrollPane(numbersPanel), BorderLayout.CENTER);
+        sortPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         sortButton.addActionListener(e -> startSorting());
-        resetButton.addActionListener(e -> parent.showIntroScreen());
+        resetButton.addActionListener(e -> initIntroScreen());
+
+        setContentPane(sortPanel);
+        revalidate();
+        repaint();
     }
 
     private void generateNumbers(int count) {
@@ -127,5 +180,9 @@ public class SortScreen extends JPanel {
         int temp = numbers[i];
         numbers[i] = numbers[j];
         numbers[j] = temp;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GranSoftTest::new);
     }
 }
